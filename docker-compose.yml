@@ -1,0 +1,135 @@
+# author: tim.schaefer.de@gmail.com
+# edited for my nextcloud
+# 
+version: '3.2'
+services:
+  db:
+    image: ${DB_DOCKER_IMAGE}
+    container_name: ${DB_CONTAINER_NAME}
+    restart: unless-stopped
+    volumes:
+      - /etc/timezone:/etc/timezone
+      - /etc/localtime:/etc/localtime
+      - ./db/mysql:/var/lib/mysql
+    environment:
+      TZ: Europe/Berlin
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
+      MYSQL_USER_FILE: /run/secrets/mysql_user
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql_user_password
+      MYSQL_DATABASE_FILE: /run/secrets/mysql_database
+    secrets:
+      - mysql_root_password
+      - mysql_user
+      - mysql_user_password
+      - mysql_database
+
+  redis:
+    image: redis:alpine
+    container_name: ${REDIS_CONTAINER_NAME}
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PW}
+    
+  web:
+    restart: unless-stopped
+    image: ${WEB_DOCKER_IMAGE}
+    container_name: ${WEB_CONTAINER_NAME}
+    depends_on:
+      - db
+      - redis
+    networks:
+      - default
+      - proxy_net
+    ports:
+      - 8480:80
+    environment:
+      TZ: Europe/Berlin
+      # proxy settings
+      VIRTUAL_HOST: ${HOST}
+      LETSENCRYPT_HOST: ${HOST}
+      LETSENCRYPT_EMAIL: ${EMAIL}
+
+      NEXTCLOUD_ADMIN_USER: admin
+      NEXTCLOUD_ADMIN_PASSWORD_FILE: /run/secrets/nextcloud_admin_password
+      # Nextcloud trusted domains
+      NEXTCLOUD_TRUSTED_DOMAINS: ${HOST}
+      # Nextcloud data path
+      NEXTCLOUD_DATA_DIR: /var/www/html/data
+      NEXTCLOUD_TABLE_PREFIX: oc_
+      # SMTP Mail setup:
+      SMTP_HOST: smtp.gmail.com
+      SMTP_SECURE: ssl
+      SMTP_PORT: 465
+      SMTP_AUTHTYPE: LOGIN
+      SMTP_NAME: ${EMAIL}
+      # the follwing are set in the mail_pw.env file
+      #SMTP_PASSWORD: 
+      #MAIL_FROM_ADDRESS: compass.cloud.dev
+      #MAIL_DOMAIN: gmail.com
+
+      REDIS_HOST: redis
+      REDIS_HOST_PASSWORD: ${REDIS_PW}
+
+      MYSQL_HOST: db
+      MYSQL_USER_FILE: /run/secrets/mysql_user
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql_user_password
+      MYSQL_DATABASE_FILE: /run/secrets/mysql_database
+    env_file:
+      - ./mail_pw.env
+    volumes:
+      - ./nextcloud_main:/var/www/html/
+      - ./config:/var/www/html/config
+      - ./data:/var/www/html/data
+      - ./php/nextcloud.ini:/usr/local/etc/php/conf.d/nextcloud.ini:ro
+    secrets:
+      - nextcloud_admin_password
+      - mysql_user
+      - mysql_user_password
+      - mysql_database
+
+  cron:
+    image: ${WEB_DOCKER_IMAGE}
+    container_name: ${CRON_CONTAINER_NAME}
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Berlin
+      REDIS_HOST: redis
+      REDIS_HOST_PASSWORD: ${REDIS_PW}
+    volumes:
+      - ./nextcloud_main:/var/www/html/
+      - ./config:/var/www/html/config
+      - ./data:/var/www/html/data
+      - ./php/nextcloud.ini:/usr/local/etc/php/conf.d/nextcloud.ini:ro
+    entrypoint: /cron.sh
+    depends_on:
+      - db
+      - redis
+
+  ## admin software
+  #adminer:
+  #  image: adminer
+  #  restart: unless-stopped
+  #  ports:
+  #    - 8080
+  #  environment:
+  #    VIRTUAL_HOST: admin.${HOST}      #,tims-manjaro.local
+  #    VIRTUAL_PORT: 8080
+  #    LETSENCRYPT_HOST: admin.${HOST}
+  #    LETSENCRYPT_EMAIL: ${EMAIL}     
+
+networks:
+    proxy_net:
+       external:
+         name: ${NETWORK}
+
+secrets:
+  nextcloud_admin_password:
+    file: ./nextcloud_admin_password.secret
+  mysql_root_password:
+    file: ./mysql_root_password.secret
+  mysql_user:
+    file: ./mysql_user.secret
+  mysql_user_password:
+    file: ./mysql_user_password.secret
+  mysql_database:
+    file: ./mysql_database.secret
+

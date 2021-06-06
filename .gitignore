@@ -1,0 +1,20 @@
+
+# snapshots folder
+.snapshots
+
+# data folder
+data/*
+db/*
+config/*
+nextcloud_main/*
+
+# hide secrets
+*.secret
+
+# hide enviroment files only use examples
+*.env
+
+# swap files from vim
+*.swp
+
+
