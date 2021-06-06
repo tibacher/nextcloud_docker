@@ -1,8 +1,8 @@
 #!/bin/bash
-#export HOME=/home/tim
+export HOME=unkown
 
 #rm $(ls -1t /home/tim/workspace/docker/nextcloud_docker/db/mysql/nextcloud-sqlbkp_* | tail -n +2)
-docker exec nc_db bash -c 'rm $(ls -1t /var/lib/mysql/$(cat $MYSQL_DATABASE_FILE)-sqlbkp_* | tail -n +2)' 
+docker exec nc_db bash -c 'rm $(ls -1t /var/lib/mysql/$(cat $MYSQL_DATABASE_FILE)-sqlbkp_* | tail -n +2)'
 
 
 scripts_path=`realpath $(dirname $(readlink -f $0))/../`
