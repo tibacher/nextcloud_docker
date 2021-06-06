@@ -1,7 +1,9 @@
 #!/bin/sh
 RC=0
 
-cd $NEXTCLOUD_DOCKER
+nextcloud_docker_path=`realpath $(dirname $(readlink -f $0))/../`
+cd $nextcloud_docker_path
+
 /usr/bin/docker-compose up -d || RC=1
 
 # optional start monit

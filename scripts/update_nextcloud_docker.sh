@@ -27,9 +27,11 @@ done
 # exit 0
 
 #open directory
-cd $NEXTCLOUD_DOCKER
+nextcloud_docker_path=`realpath $(dirname $(readlink -f $0))/../`
+cd $nextcloud_docker_path
+
 #enable maintenace mode
-bash $NEXTCLOUD_DOCKER/scripts/nextcloud_scripts/maintenance_enable.sh 
+bash $nextcloud_docker_path/scripts/nextcloud_scripts/maintenance_enable.sh 
 
 # make snapper create here
 #N=$(snapper -c nextcloud create -d "NC update to $nc_version pre" -t pre -p)
@@ -51,4 +53,4 @@ docker exec -it -u www-data nc_cron php /var/www/html/occ upgrade
 #snapper -c nextcloud create -d "NC update post" -t post --pre-number $N
 
 #disable maintenace mode
-bash $NEXTCLOUD_DOCKER/scripts/nextcloud_scripts/maintenance_disable.sh
+bash $nextcloud_docker_path/scripts/nextcloud_scripts/maintenance_disable.sh

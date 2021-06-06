@@ -1,8 +1,11 @@
 #!/bin/sh
-nc_path=$NEXTCLOUD_DOCKER
 RC=0
+
+nextcloud_docker_path=`realpath $(dirname $(readlink -f $0))/../`
+cd $nextcloud_docker_path
+
 sudo monit unmonitor nextcloud
 sudo monit unmonitor nextcloud-local
-cd $nc_path
+
 /usr/bin/docker-compose down -v --remove-orphans || RC=1
 exit $RC
