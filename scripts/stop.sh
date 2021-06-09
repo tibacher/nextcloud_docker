@@ -1,8 +1,8 @@
 #!/bin/sh
 RC=0
 
-nextcloud_docker_path=`realpath $(dirname $(readlink -f $0))/../`
-cd $nextcloud_docker_path
+docker_path=`realpath $(dirname $(readlink -f $0))/../`
+cd $docker_path
 
 sudo monit unmonitor nextcloud
 sudo monit unmonitor nextcloud-local

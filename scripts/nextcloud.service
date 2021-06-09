@@ -6,9 +6,8 @@ After=docker.service
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-Environment="NEXTCLOUD_DOCKER=/home/tim/workspace/docker/nextcloud_docker/"
-ExecStart=/home/tim/workspace/docker/nextcloud_docker/scripts/start.sh
-ExecStop=/home/tim/workspace/docker/nextcloudI_docker/scripts/stop.sh
+ExecStart=/docker/nextcloud_docker/scripts/start.sh
+ExecStop=/docker/nextcloud_docker/scripts/stop.sh
 
 [Install]
 WantedBy=default.target
