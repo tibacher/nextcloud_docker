@@ -8,8 +8,6 @@ services:
     container_name: ${DB_CONTAINER_NAME}
     restart: unless-stopped
     volumes:
-      - /etc/timezone:/etc/timezone
-      - /etc/localtime:/etc/localtime
       - ./db/mysql:/var/lib/mysql
     environment:
       TZ: Europe/Berlin
@@ -40,13 +38,14 @@ services:
       - default
       - proxy_net
     ports:
-      - 8480:80
+      - 8080:80
     environment:
       TZ: Europe/Berlin
       # proxy settings
       VIRTUAL_HOST: ${HOST}
       LETSENCRYPT_HOST: ${HOST}
       LETSENCRYPT_EMAIL: ${EMAIL}
+      ENABLE_ACME: 'true'
 
       NEXTCLOUD_ADMIN_USER: admin
       NEXTCLOUD_ADMIN_PASSWORD_FILE: /run/secrets/nextcloud_admin_password
@@ -54,9 +53,9 @@ services:
       NEXTCLOUD_TRUSTED_DOMAINS: ${HOST}
       # Nextcloud data path
       NEXTCLOUD_DATA_DIR: /var/www/html/data
-      NEXTCLOUD_TABLE_PREFIX: oc_
+      NEXTCLOUD_TABLE_PREFIX: oc
       # SMTP Mail setup:
-      SMTP_HOST: smtp.gmail.com
+      SMTP_HOST: smtp.web.de
       SMTP_SECURE: ssl
       SMTP_PORT: 465
       SMTP_AUTHTYPE: LOGIN

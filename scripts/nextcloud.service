@@ -6,8 +6,8 @@ After=docker.service
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/docker/nextcloud_docker/scripts/start.sh
-ExecStop=/docker/nextcloud_docker/scripts/stop.sh
+ExecStart=/docker/nextcloud/scripts/start.sh
+ExecStop=/docker/nextcloud/scripts/stop.sh
 
 [Install]
 WantedBy=default.target
