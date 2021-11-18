@@ -20,7 +20,7 @@ then
 		echo "No command found. Enter new one..."
 	fi
 	echo 
-	ec f 
+	echo
 	echo "Enter occ command:"
 	done
 	done

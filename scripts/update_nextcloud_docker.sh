@@ -47,6 +47,28 @@ sudo systemctl stop nextcloud.service
 #pull docker image update
 docker-compose pull
 
+nc_version=$(docker inspect $WEB_DOCKER_IMAGE|grep NEXTCLOUD_VERSION -m1 | cut -d = -f 2 |cut -d \" -f 1)
+echo "Your updated Nextcloud-Version is: $nc_version"
+echo
+echo "Do you want to procced with a start of nextcloud?"
+
+select opt in yes no
+do
+    case $opt in
+        "yes")
+            echo "start nextcloud..."
+			break
+            ;;
+        "no")
+            echo "exit..."
+			exit 1
+            ;;
+        *) echo "invalid option $REPLY";;
+    esac
+done
+
+
+
 # Start nextcloud docker instance
 sudo systemctl start nextcloud.service
 
