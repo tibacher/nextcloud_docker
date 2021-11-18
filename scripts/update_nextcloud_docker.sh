@@ -1,9 +1,17 @@
 #!/bin/bash
 
-nc_version=$(docker inspect nextcloud:apache|grep NEXTCLOUD_VERSION -m1 | cut -d = -f 2 |cut -d \" -f 1)
+#open directory
+nextcloud_docker_path=`realpath $(dirname $(readlink -f $0))/../`
+cd $nextcloud_docker_path
 
 
-echo "You will update to Nextcloud-Version: $nc_version"
+source .env
+
+
+nc_version=$(docker inspect $WEB_DOCKER_IMAGE|grep NEXTCLOUD_VERSION -m1 | cut -d = -f 2 |cut -d \" -f 1)
+
+
+echo "Your current Nextcloud-Version: $nc_version"
 echo
 echo "Do you want to procced?"
 
@@ -25,10 +33,6 @@ done
 
 # uncomment to interupt
 # exit 0
-
-#open directory
-nextcloud_docker_path=`realpath $(dirname $(readlink -f $0))/../`
-cd $nextcloud_docker_path
 
 #enable maintenace mode
 #bash $nextcloud_docker_path/scripts/nextcloud_scripts/maintenance_enable.sh 

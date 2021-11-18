@@ -15,12 +15,12 @@ then
 	if [[ ! -z "$command" ]]
 	then
 	echo "Execute: occ $command"
-		docker exec -it -u www-data  nc_cron php /var/www/html/occ $command
+	  eval "docker exec -it -u www-data  nc_cron php /var/www/html/occ -n $command"
 	else
 		echo "No command found. Enter new one..."
 	fi
 	echo 
-	echo 
+	ec f 
 	echo "Enter occ command:"
 	done
 	done
@@ -31,5 +31,5 @@ else
     command=$(echo $command | sed 's/occ//')
 	fi
 	echo "Execute: occ $command"
-	docker exec -it -u www-data  nc_cron php /var/www/html/occ $command
+	eval "docker exec -it -u www-data  nc_cron php /var/www/html/occ -n $command"
 fi

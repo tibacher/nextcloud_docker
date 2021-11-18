@@ -55,7 +55,7 @@ services:
       NEXTCLOUD_DATA_DIR: /var/www/html/data
       NEXTCLOUD_TABLE_PREFIX: oc
       # SMTP Mail setup:
-      SMTP_HOST: smtp.web.de
+      SMTP_HOST: smtp.gmail.com
       SMTP_SECURE: ssl
       SMTP_PORT: 465
       SMTP_AUTHTYPE: LOGIN
