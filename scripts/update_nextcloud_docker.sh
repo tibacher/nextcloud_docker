@@ -1,9 +1,17 @@
 #!/bin/bash
 
-nc_version=$(docker inspect nextcloud:apache|grep NEXTCLOUD_VERSION -m1 | cut -d = -f 2 |cut -d \" -f 1)
+#open directory
+nextcloud_docker_path=`realpath $(dirname $(readlink -f $0))/../`
+cd $nextcloud_docker_path
 
 
-echo "You will update to Nextcloud-Version: $nc_version"
+source .env
+
+
+nc_version=$(docker inspect $WEB_DOCKER_IMAGE|grep NEXTCLOUD_VERSION -m1 | cut -d = -f 2 |cut -d \" -f 1)
+
+
+echo "Your current Nextcloud-Version: $nc_version"
 echo
 echo "Do you want to procced?"
 
@@ -26,15 +34,11 @@ done
 # uncomment to interupt
 # exit 0
 
-#open directory
-nextcloud_docker_path=`realpath $(dirname $(readlink -f $0))/../`
-cd $nextcloud_docker_path
-
 #enable maintenace mode
-bash $nextcloud_docker_path/scripts/nextcloud_scripts/maintenance_enable.sh 
+#bash $nextcloud_docker_path/scripts/nextcloud_scripts/maintenance_enable.sh 
 
 # make snapper create here
-#N=$(snapper -c nextcloud create -d "NC update to $nc_version pre" -t pre -p)
+N=$(snapper -c docker create -d "NC update to $nc_version pre" -t pre -p)
 
 # Stop nextcloud docker instance
 sudo systemctl stop nextcloud.service
@@ -43,6 +47,28 @@ sudo systemctl stop nextcloud.service
 #pull docker image update
 docker-compose pull
 
+nc_version=$(docker inspect $WEB_DOCKER_IMAGE|grep NEXTCLOUD_VERSION -m1 | cut -d = -f 2 |cut -d \" -f 1)
+echo "Your updated Nextcloud-Version is: $nc_version"
+echo
+echo "Do you want to procced with a start of nextcloud?"
+
+select opt in yes no
+do
+    case $opt in
+        "yes")
+            echo "start nextcloud..."
+			break
+            ;;
+        "no")
+            echo "exit..."
+			exit 1
+            ;;
+        *) echo "invalid option $REPLY";;
+    esac
+done
+
+
+
 # Start nextcloud docker instance
 sudo systemctl start nextcloud.service
 
@@ -50,7 +76,7 @@ sudo systemctl start nextcloud.service
 docker exec -it -u www-data nc_cron php /var/www/html/occ upgrade
 
 
-#snapper -c nextcloud create -d "NC update post" -t post --pre-number $N
+snapper -c docker create -d "NC update post" -t post --pre-number $N
 
 #disable maintenace mode
-bash $nextcloud_docker_path/scripts/nextcloud_scripts/maintenance_disable.sh
+#bash $nextcloud_docker_path/scripts/nextcloud_scripts/maintenance_disable.sh
