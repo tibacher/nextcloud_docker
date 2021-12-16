@@ -7,7 +7,14 @@ cd $nextcloud_docker_path
 
 source .env
 
+LOCAL_IMAGE="nextcloud"
+DOCKERHUB_LIST_TAGS=($(wget -q https://registry.hub.docker.com/v1/repositories/$LOCAL_IMAGE/tags -O - | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | awk -F: '{print $3}' | grep '^[0-9]' | grep -v '-' | grep -v '\.[0-9]\.'))
 
+
+echo "Available Nextcloud versions: ${DOCKERHUB_LIST_TAGS[*]: -20 : 18}"  
+
+echo "Your desired tag: $WEB_DOCKER_IMAGE"
+ 
 nc_version=$(docker inspect $WEB_DOCKER_IMAGE|grep NEXTCLOUD_VERSION -m1 | cut -d = -f 2 |cut -d \" -f 1)
 
 
