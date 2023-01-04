@@ -105,16 +105,15 @@ services:
       - redis
 
   # admin software
-  adminer:
-    image: adminer
-    restart: unless-stopped
-    ports:
-      - 8787:8080
+  #adminer:
+  #  image: adminer
+  #  restart: unless-stopped
+  #  ports:
+  #    - 8787:8080
 
 
 networks:
     proxy_net:
-       external:
          name: ${NETWORK}
 
 secrets:

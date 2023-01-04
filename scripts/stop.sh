@@ -7,5 +7,5 @@ cd $docker_path
 sudo monit unmonitor nextcloud
 sudo monit unmonitor nextcloud-local
 
-/usr/bin/docker-compose down -v --remove-orphans || RC=1
+docker compose down -v --remove-orphans || RC=1
 exit $RC
