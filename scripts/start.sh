@@ -7,6 +7,6 @@ cd $docker_path
 docker compose up -d || RC=1
 
 # optional start monit
-sleep 120 && sudo monit monitor nextcloud & sudo monit monitor nextcloud-local &
+sleep 240 && sudo monit monitor nextcloud & sudo monit monitor nextcloud-local &
 
 exit $RC
