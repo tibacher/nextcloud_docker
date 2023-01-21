@@ -17,6 +17,8 @@ services:
       MYSQL_USER_FILE: /run/secrets/mysql_user
       MYSQL_PASSWORD_FILE: /run/secrets/mysql_user_password
       MYSQL_DATABASE_FILE: /run/secrets/mysql_database
+      MARIADB_AUTO_UPGRADE: "1"
+      MARIADB_INITDB_SKIP_TZINFO: "1"
     secrets:
       - mysql_root_password
       - mysql_user
@@ -104,6 +106,23 @@ services:
       - db
       - redis
 
+
+  elasticsearch:
+    build: ./elasticsearch
+    container_name: elasticsearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./elasticsearch/data:/usr/share/elasticsearch/data
+    networks:
+      - default
+
+  
   # admin software
   #adminer:
   #  image: adminer

@@ -79,9 +79,13 @@ done
 
 
 # Start nextcloud docker instance
-docker compose up -d
+sudo systemctl start nextcloud.service 
 
-docker logs nc_web -f
+sudo monit unmonitor nextcloud
+sudo monit unmonitor nextcloud-local
+
+bash scripts/nextcloud_scripts/maintenance_disable.sh 
+bash scripts/nextcloud_scripts/enter_occ_command.sh "upgrade"    
 
 bash $nextcloud_docker_path/scripts/nextcloud_scripts/add_indicies_and_colums.sh 
 
@@ -107,4 +111,6 @@ done
 
 
 sudo systemctl start nextcloud.service 
+
+sleep 240 && sudo monit monitor nextcloud & sudo monit monitor nextcloud-local &
 

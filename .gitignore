@@ -3,10 +3,11 @@
 .snapshots
 
 # data folder
-data/*
-db/*
-config/*
-nextcloud_main/*
+data/
+elasticsearch/data/
+db/
+config/
+nextcloud_main/
 
 # hide secrets
 *.secret
