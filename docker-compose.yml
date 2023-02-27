@@ -121,6 +121,7 @@ services:
       - ./elasticsearch/data:/usr/share/elasticsearch/data
     networks:
       - default
+    mem_limit: 2048m
 
   
   # admin software
