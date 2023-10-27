@@ -135,6 +135,7 @@ services:
 networks:
     proxy_net:
          name: ${NETWORK}
+         external: true
 
 secrets:
   nextcloud_admin_password:
