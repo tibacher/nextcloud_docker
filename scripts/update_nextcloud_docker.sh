@@ -4,7 +4,6 @@
 nextcloud_docker_path=`realpath $(dirname $(readlink -f $0))/../`
 cd $nextcloud_docker_path
 
-
 source .env
 
 LOCAL_IMAGE="nextcloud"
@@ -79,13 +78,12 @@ done
 
 
 # Start nextcloud docker instance
-sudo systemctl start nextcloud.service 
+docker compose up -d
 
-sudo monit unmonitor nextcloud
-sudo monit unmonitor nextcloud-local
+sleep 10
 
-bash scripts/nextcloud_scripts/maintenance_disable.sh 
-bash scripts/nextcloud_scripts/enter_occ_command.sh "upgrade"    
+bash $nextcloud_docker_path/scripts/nextcloud_scripts/maintenance_disable.sh 
+bash $nextcloud_docker_path/scripts/nextcloud_scripts/enter_occ_command.sh "upgrade"    
 
 bash $nextcloud_docker_path/scripts/nextcloud_scripts/add_indicies_and_colums.sh 
 
