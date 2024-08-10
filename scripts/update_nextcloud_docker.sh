@@ -16,7 +16,7 @@ echo "Available Nextcloud versions: ${DOCKERHUB_LIST_TAGS[*]: -20 : 18}"
 
 echo "Your desired tag: $WEB_DOCKER_IMAGE"
  
-nc_version=$(docker inspect $WEB_DOCKER_IMAGE|grep NEXTCLOUD_VERSION -m1 | cut -d = -f 2 |cut -d \" -f 1)
+nc_version=$(docker inspect $WEB_CONTAINER_NAME|grep NEXTCLOUD_VERSION -m1 | cut -d = -f 2 |cut -d \" -f 1)
 
 
 echo "Your current Nextcloud-Version: $nc_version"
@@ -49,14 +49,20 @@ bash $nextcloud_docker_path/scripts/backup_scripts/backup_nextcloud_docker_pre.s
 #N=$(snapper -c docker create -d "NC update to $nc_version pre" -t pre -p)
 
 # Stop nextcloud docker instance
+
+echo "Stopping Nextcloud..."
+
 sudo systemctl stop nextcloud.service
+sleep 5
 docker compose down --remove-orphans  
 
-#pull docker image update
+echo "Nextcloud has been stopped!"
+
+# pull docker image update
 docker compose pull
 
 nc_version=$(docker inspect $WEB_DOCKER_IMAGE|grep NEXTCLOUD_VERSION -m1 | cut -d = -f 2 |cut -d \" -f 1)
-echo "Your updated Nextcloud-Version is: $nc_version"
+echo "You will update to Nextcloud-Version: $nc_version"
 echo
 echo "Do you want to procced with a start of nextcloud upgrade?"
 
@@ -68,6 +74,11 @@ do
 			break
             ;;
         "no")
+            # Start nextcloud docker instance
+            docker compose up -d
+            sudo systemctl start nextcloud.service 
+            sleep 5
+            bash $nextcloud_docker_path/scripts/nextcloud_scripts/maintenance_disable.sh 
             echo "exit..."
 			exit 1
             ;;
@@ -80,10 +91,39 @@ done
 # Start nextcloud docker instance
 docker compose up -d
 
-sleep 10
+echo "Waiting 20s to start"
+sleep 20
+
+echo "Starting upgrade now!"
+
+if bash $nextcloud_docker_path/scripts/nextcloud_scripts/enter_occ_command.sh "upgrade" ; then
+    echo "upgrade command succeeded"
+else
+    echo "Upgrade command failed. Do you want try again?"
+    
+    select opt in yes no
+    do
+        case $opt in
+            "yes")
+                echo "Starting upgrade now!"
+                if bash $nextcloud_docker_path/scripts/nextcloud_scripts/enter_occ_command.sh "upgrade" ; then
+                    echo "upgrade command succeeded"
+                else
+                    echo "The Upgrade command failed a secondtime, please try running 'occ upgrade' manually again."
+                    exit 1
+    			break
+                ;;
+            "no")
+                echo "Please try running 'occ upgrade' manually again."
+                exit 1
+            *) echo "invalid option $REPLY";;
+        esac
+    done
+
+fi
+
 
 bash $nextcloud_docker_path/scripts/nextcloud_scripts/maintenance_disable.sh 
-bash $nextcloud_docker_path/scripts/nextcloud_scripts/enter_occ_command.sh "upgrade"    
 
 bash $nextcloud_docker_path/scripts/nextcloud_scripts/add_indicies_and_colums.sh 
 
@@ -99,7 +139,7 @@ do
 			break
             ;;
         "no")
-            echo "exit..."
+            echo "exit without starting..."
 			exit 1
             ;;
         *) echo "invalid option $REPLY";;
@@ -109,6 +149,10 @@ done
 
 
 sudo systemctl start nextcloud.service 
+
+sleep 5
+
+bash $nextcloud_docker_path/scripts/nextcloud_scripts/maintenance_disable.sh 
 
 sleep 240 && sudo monit monitor nextcloud & sudo monit monitor nextcloud-local &
 
