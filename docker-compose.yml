@@ -78,7 +78,7 @@ services:
       - ./config:/var/www/html/config
       - ./data:/var/www/html/data
       - ./php/nextcloud.ini:/usr/local/etc/php/conf.d/nextcloud.ini:ro
-      - /mnt/photos_hdd/photo_hdd_nc:/mnt/photo_hdd_nc/
+      - /mnt/photos_hdd/:/mnt/photo_hdd_nc/
     secrets:
       - nextcloud_admin_password
       - mysql_user
@@ -98,7 +98,7 @@ services:
       - ./config:/var/www/html/config
       - ./data:/var/www/html/data
       - ./php/nextcloud.ini:/usr/local/etc/php/conf.d/nextcloud.ini:ro
-      - /mnt/photos_hdd/photo_hdd_nc:/mnt/photo_hdd_nc/
+      - /mnt/photos_hdd/:/mnt/photo_hdd_nc/
     entrypoint: /cron.sh
     depends_on:
       - db
